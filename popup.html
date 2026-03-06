@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NAS/BNG Finder</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="container">
+      <h1>NAS / BNG Finder</h1>
+
+      <div class="row two">
+        <button id="detectBtn">Deteksi dari halaman</button>
+        <button id="generateBtn" class="secondary">Generate Radius Data</button>
+      </div>
+
+      <div class="row two">
+        <button id="copyRadiusBtn" class="secondary">Copy Radius</button>
+        <button id="showSavedBtn" class="secondary">Tampilkan Data Tersimpan</button>
+      </div>
+
+      <label for="regionSelect">REGION</label>
+      <select id="regionSelect"></select>
+
+      <label for="vlanInput">VLAN</label>
+      <input id="vlanInput" type="text" inputmode="numeric" placeholder="Contoh: 2930" />
+
+      <button id="searchBtn" class="primary">Cari NAS / BNG</button>
+
+      <section class="result" aria-live="polite">
+        <div class="result-title">Hasil Pencarian</div>
+        <div class="result-row">
+          <span class="result-label">NAS</span>
+          <strong id="nasValue" class="result-value">-</strong>
+        </div>
+        <div class="result-row">
+          <span class="result-label">BNG</span>
+          <strong id="bngValue" class="result-value">-</strong>
+        </div>
+      </section>
+
+      <section id="radiusSection" class="radius-output is-hidden">
+        <div class="result-title">Radius Data</div>
+        <textarea
+          id="radiusOutput"
+          readonly
+          placeholder="Klik 'Generate Radius Data' untuk ambil data customer dari halaman iCRM."
+        ></textarea>
+      </section>
+
+      <section id="savedSection" class="radius-output is-hidden">
+        <div class="result-title">Data Tersimpan</div>
+        <textarea id="savedOutput" readonly placeholder="Belum ada data tersimpan."></textarea>
+      </section>
+
+      <p id="status"></p>
+    </main>
+
+    <script src="popup.js" type="module"></script>
+  </body>
+</html>

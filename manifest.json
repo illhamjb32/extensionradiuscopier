@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "NOC NAS/BNG Finder",
+  "version": "1.0.0",
+  "description": "Ambil data NAS dan BNG dari Google Sheet berdasarkan VLAN dan REGION pada halaman aktif.",
+  "permissions": ["activeTab", "scripting", "tabs", "storage"],
+  "host_permissions": ["https://docs.google.com/*"],
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "NAS/BNG Finder",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
