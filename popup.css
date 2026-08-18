@@ -88,6 +88,14 @@ body {
   letter-spacing: 0.3px;
 }
 
+.app-credit {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  text-align: right;
+  margin: -4px 0 2px;
+  letter-spacing: 0.2px;
+}
+
 /* ── Card ── */
 .card {
   background: var(--color-surface);
