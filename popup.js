@@ -548,7 +548,7 @@ checkUpdateBtn.addEventListener("click", async () => {
     );
     if (!res.ok) throw new Error("Gagal ambil data update.");
     const text = await res.text();
-    const match = text.match(/version="([^"]+)"/);
+    const match = text.match(/version=["']([^"']+)["']/);
     if (!match) throw new Error("Format update.xml tidak dikenali.");
     const latest = match[1];
 
