@@ -446,6 +446,43 @@ select:focus {
   border-radius: 3px;
 }
 
+.help-divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 2px 0;
+}
+
+.help-version-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.help-version-text {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.help-update-result {
+  font-size: 12px;
+  min-height: 16px;
+  padding: 2px 0;
+}
+
+.help-update-result.is-ok {
+  color: var(--color-success);
+}
+
+.help-update-result.is-new {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.help-update-result.is-error {
+  color: var(--color-error);
+}
+
 /* ── Utility ── */
 .is-hidden {
   display: none !important;

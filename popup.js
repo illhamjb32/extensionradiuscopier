@@ -23,6 +23,9 @@ const copyBngBtn = document.getElementById("copyBngBtn");
 const helpBtn = document.getElementById("helpBtn");
 const helpModal = document.getElementById("helpModal");
 const helpClose = document.getElementById("helpClose");
+const helpVersionText = document.getElementById("helpVersionText");
+const checkUpdateBtn = document.getElementById("checkUpdateBtn");
+const helpUpdateResult = document.getElementById("helpUpdateResult");
 const radiusDot = document.getElementById("radiusDot");
 const radiusKeepaliveStatus = document.getElementById("radiusStatus");
 const radiusToggle = document.getElementById("radiusToggle");
@@ -520,9 +523,51 @@ searchBtn.addEventListener("click", async () => {
   }
 });
 
-helpBtn.addEventListener("click", () => helpModal.classList.remove("is-hidden"));
+helpBtn.addEventListener("click", () => {
+  const manifest = chrome.runtime.getManifest();
+  helpVersionText.textContent = `Versi saat ini: ${manifest.version}`;
+  helpUpdateResult.textContent = "";
+  helpUpdateResult.className = "help-update-result";
+  helpModal.classList.remove("is-hidden");
+});
 helpClose.addEventListener("click", () => helpModal.classList.add("is-hidden"));
 helpModal.addEventListener("click", (e) => { if (e.target === helpModal) helpModal.classList.add("is-hidden"); });
+
+checkUpdateBtn.addEventListener("click", async () => {
+  checkUpdateBtn.disabled = true;
+  checkUpdateBtn.textContent = "Mengecek...";
+  helpUpdateResult.textContent = "";
+  helpUpdateResult.className = "help-update-result";
+
+  try {
+    const manifest = chrome.runtime.getManifest();
+    const current = manifest.version;
+    const res = await fetch(
+      "https://illhamjb32.github.io/extensionradiuscopier/dist/update.xml",
+      { cache: "no-store" }
+    );
+    if (!res.ok) throw new Error("Gagal ambil data update.");
+    const text = await res.text();
+    const match = text.match(/version="([^"]+)"/);
+    if (!match) throw new Error("Format update.xml tidak dikenali.");
+    const latest = match[1];
+
+    const toNum = (v) => v.split(".").map(Number).reduce((a, n, i) => a + n * Math.pow(1000, 2 - i), 0);
+    if (toNum(latest) > toNum(current)) {
+      helpUpdateResult.textContent = `Update tersedia: v${latest} — perbarui extension kamu.`;
+      helpUpdateResult.className = "help-update-result is-new";
+    } else {
+      helpUpdateResult.textContent = `Up to date — kamu sudah pakai versi terbaru (v${current}).`;
+      helpUpdateResult.className = "help-update-result is-ok";
+    }
+  } catch (err) {
+    helpUpdateResult.textContent = err.message || "Gagal cek update.";
+    helpUpdateResult.className = "help-update-result is-error";
+  } finally {
+    checkUpdateBtn.disabled = false;
+    checkUpdateBtn.textContent = "Cek Update";
+  }
+});
 
 copyNasBtn.addEventListener("click", async () => {
   const val = nasValue.textContent.trim();
