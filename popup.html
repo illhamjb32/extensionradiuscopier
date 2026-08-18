@@ -14,7 +14,44 @@
           <span class="app-title">NAS / BNG Finder</span>
         </div>
         <span class="app-badge">iCRM Tool</span>
+        <button id="helpBtn" class="btn-help" title="Cara pakai">?</button>
       </header>
+
+      <!-- Modal Cara Pakai -->
+      <div id="helpModal" class="modal-overlay is-hidden">
+        <div class="modal-box">
+          <div class="modal-header">
+            <span class="modal-title">Cara Pakai</span>
+            <button id="helpClose" class="modal-close">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="help-section">
+              <div class="help-step-title">Deteksi Halaman</div>
+              <div class="help-step-desc">Buka halaman iCRM customer, klik <b>Deteksi Halaman</b> — VLAN &amp; Region otomatis terisi.</div>
+            </div>
+            <div class="help-section">
+              <div class="help-step-title">Cari NAS / BNG</div>
+              <div class="help-step-desc">Pilih Region &amp; isi VLAN manual, lalu klik <b>Cari NAS / BNG</b>. Gunakan tombol <b>Copy NAS</b> atau <b>Copy BNG</b> untuk salin hasilnya.</div>
+            </div>
+            <div class="help-section">
+              <div class="help-step-title">Generate Radius</div>
+              <div class="help-step-desc">Buka halaman detail customer iCRM, klik <b>Generate Radius</b> untuk mengambil semua data sekaligus.</div>
+            </div>
+            <div class="help-section">
+              <div class="help-step-title">Copy Radius</div>
+              <div class="help-step-desc">Buka halaman <code>/customer/user/edit?id=...</code>, klik <b>Copy Radius</b> untuk salin data radius existing.</div>
+            </div>
+            <div class="help-section">
+              <div class="help-step-title">Session Keepalive</div>
+              <div class="help-step-desc">Aktifkan keepalive agar sesi <b>iCRM</b> dan <b>Radius</b> tidak logout otomatis — di-ping tiap 4 menit.</div>
+            </div>
+            <div class="help-section">
+              <div class="help-step-title">Error "Receiving end does not exist"</div>
+              <div class="help-step-desc">Refresh tab halaman iCRM terlebih dahulu, lalu buka popup kembali.</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="card">
         <div class="card-label">Aksi Cepat</div>

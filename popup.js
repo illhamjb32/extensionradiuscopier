@@ -20,6 +20,9 @@ const keepaliveToggle = document.getElementById("keepaliveToggle");
 const keepaliveLastPing = document.getElementById("keepaliveLastPing");
 const copyNasBtn = document.getElementById("copyNasBtn");
 const copyBngBtn = document.getElementById("copyBngBtn");
+const helpBtn = document.getElementById("helpBtn");
+const helpModal = document.getElementById("helpModal");
+const helpClose = document.getElementById("helpClose");
 const radiusDot = document.getElementById("radiusDot");
 const radiusKeepaliveStatus = document.getElementById("radiusStatus");
 const radiusToggle = document.getElementById("radiusToggle");
@@ -516,6 +519,10 @@ searchBtn.addEventListener("click", async () => {
     setStatus(error.message || "Terjadi kesalahan saat mencari.", true);
   }
 });
+
+helpBtn.addEventListener("click", () => helpModal.classList.remove("is-hidden"));
+helpClose.addEventListener("click", () => helpModal.classList.add("is-hidden"));
+helpModal.addEventListener("click", (e) => { if (e.target === helpModal) helpModal.classList.add("is-hidden"); });
 
 copyNasBtn.addEventListener("click", async () => {
   const val = nasValue.textContent.trim();
