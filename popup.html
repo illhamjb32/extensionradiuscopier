@@ -8,28 +8,56 @@
   </head>
   <body>
     <main class="container">
-      <h1>NAS / BNG Finder</h1>
+      <header class="app-header">
+        <div class="app-logo">
+          <img src="icons/icon-48.png" alt="" width="24" height="24" onerror="this.style.display='none'" />
+          <span class="app-title">NAS / BNG Finder</span>
+        </div>
+        <span class="app-badge">iCRM Tool</span>
+      </header>
 
-      <div class="row two">
-        <button id="detectBtn">Deteksi dari halaman</button>
-        <button id="generateBtn" class="secondary">Generate Radius Data</button>
+      <div class="card">
+        <div class="card-label">Aksi Cepat</div>
+        <div class="row two">
+          <button id="detectBtn" class="btn btn-outline">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Deteksi Halaman
+          </button>
+          <button id="generateBtn" class="btn btn-outline">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Generate Radius
+          </button>
+        </div>
+        <div class="row two">
+          <button id="copyRadiusBtn" class="btn btn-outline">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Radius
+          </button>
+          <button id="showSavedBtn" class="btn btn-outline">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Data Tersimpan
+          </button>
+        </div>
       </div>
 
-      <div class="row two">
-        <button id="copyRadiusBtn" class="secondary">Copy Radius</button>
-        <button id="showSavedBtn" class="secondary">Tampilkan Data Tersimpan</button>
+      <div class="card">
+        <div class="card-label">Pencarian NAS / BNG</div>
+        <div class="field-group">
+          <label for="regionSelect">REGION</label>
+          <select id="regionSelect"></select>
+        </div>
+        <div class="field-group">
+          <label for="vlanInput">VLAN</label>
+          <input id="vlanInput" type="text" inputmode="numeric" placeholder="Contoh: 2930" />
+        </div>
+        <button id="searchBtn" class="btn btn-primary">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Cari NAS / BNG
+        </button>
       </div>
 
-      <label for="regionSelect">REGION</label>
-      <select id="regionSelect"></select>
-
-      <label for="vlanInput">VLAN</label>
-      <input id="vlanInput" type="text" inputmode="numeric" placeholder="Contoh: 2930" />
-
-      <button id="searchBtn" class="primary">Cari NAS / BNG</button>
-
-      <section class="result" aria-live="polite">
-        <div class="result-title">Hasil Pencarian</div>
+      <section class="card result-card" aria-live="polite">
+        <div class="card-label">Hasil Pencarian</div>
         <div class="result-row">
           <span class="result-label">NAS</span>
           <strong id="nasValue" class="result-value">-</strong>
@@ -38,23 +66,57 @@
           <span class="result-label">BNG</span>
           <strong id="bngValue" class="result-value">-</strong>
         </div>
+        <div class="row two">
+          <button id="copyNasBtn" class="btn btn-outline btn-sm">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy NAS
+          </button>
+          <button id="copyBngBtn" class="btn btn-outline btn-sm">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy BNG
+          </button>
+        </div>
       </section>
 
-      <section id="radiusSection" class="radius-output is-hidden">
-        <div class="result-title">Radius Data</div>
+      <section id="radiusSection" class="card output-card is-hidden">
+        <div class="card-label">Radius Data</div>
         <textarea
           id="radiusOutput"
           readonly
-          placeholder="Klik 'Generate Radius Data' untuk ambil data customer dari halaman iCRM."
+          placeholder="Klik 'Generate Radius' untuk ambil data customer dari halaman iCRM."
         ></textarea>
       </section>
 
-      <section id="savedSection" class="radius-output is-hidden">
-        <div class="result-title">Data Tersimpan</div>
+      <section id="savedSection" class="card output-card is-hidden">
+        <div class="card-label">Data Tersimpan</div>
         <textarea id="savedOutput" readonly placeholder="Belum ada data tersimpan."></textarea>
       </section>
 
-      <p id="status"></p>
+      <div class="card keepalive-card">
+        <div class="card-label">Session Keepalive — iCRM</div>
+        <div class="keepalive-row">
+          <div class="keepalive-info">
+            <span class="keepalive-dot" id="keepaliveDot"></span>
+            <span id="keepaliveStatus" class="keepalive-status-text">Memuat...</span>
+          </div>
+          <button id="keepaliveToggle" class="btn btn-outline btn-sm">-</button>
+        </div>
+        <div id="keepaliveLastPing" class="keepalive-last-ping"></div>
+      </div>
+
+      <div class="card keepalive-card">
+        <div class="card-label">Session Keepalive — Radius</div>
+        <div class="keepalive-row">
+          <div class="keepalive-info">
+            <span class="keepalive-dot" id="radiusDot"></span>
+            <span id="radiusStatus" class="keepalive-status-text">Memuat...</span>
+          </div>
+          <button id="radiusToggle" class="btn btn-outline btn-sm">-</button>
+        </div>
+        <div id="radiusLastPing" class="keepalive-last-ping"></div>
+      </div>
+
+      <div id="status" class="status-bar" role="status"></div>
     </main>
 
     <script src="popup.js" type="module"></script>

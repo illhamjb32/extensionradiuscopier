@@ -14,9 +14,84 @@ const radiusOutput = document.getElementById("radiusOutput");
 const savedSection = document.getElementById("savedSection");
 const savedOutput = document.getElementById("savedOutput");
 const statusText = document.getElementById("status");
+const keepaliveDot = document.getElementById("keepaliveDot");
+const keepaliveStatus = document.getElementById("keepaliveStatus");
+const keepaliveToggle = document.getElementById("keepaliveToggle");
+const keepaliveLastPing = document.getElementById("keepaliveLastPing");
+const copyNasBtn = document.getElementById("copyNasBtn");
+const copyBngBtn = document.getElementById("copyBngBtn");
+const radiusDot = document.getElementById("radiusDot");
+const radiusKeepaliveStatus = document.getElementById("radiusStatus");
+const radiusToggle = document.getElementById("radiusToggle");
+const radiusLastPing = document.getElementById("radiusLastPing");
 const STORAGE_KEY = "LAST_GENERATED_RADIUS_DATA";
 
 let latestResult = null;
+
+function formatLastPing(isoString) {
+  if (!isoString) return "";
+  const d = new Date(isoString);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `Ping terakhir: ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+function applyKeepaliveUI(enabled, status, lastPing) {
+  keepaliveDot.className = "keepalive-dot " + (enabled ? "dot-on" : "dot-off");
+  keepaliveStatus.textContent = enabled
+    ? status === "ok" ? "Aktif — sesi terjaga"
+    : status === "error" ? "Aktif — gagal ping"
+    : "Aktif — menunggu ping..."
+    : "Nonaktif";
+  keepaliveToggle.textContent = enabled ? "Matikan" : "Aktifkan";
+  keepaliveToggle.className = "btn btn-sm " + (enabled ? "btn-danger" : "btn-primary");
+  keepaliveLastPing.textContent = enabled ? formatLastPing(lastPing) : "";
+}
+
+async function loadKeepaliveStatus() {
+  try {
+    const res = await chrome.runtime.sendMessage({ type: "KEEPALIVE_GET_STATUS" });
+    applyKeepaliveUI(res.enabled, res.status, res.lastPing);
+  } catch {
+    applyKeepaliveUI(false, "off", null);
+  }
+}
+
+keepaliveToggle.addEventListener("click", async () => {
+  const res = await chrome.runtime.sendMessage({ type: "KEEPALIVE_GET_STATUS" });
+  const nowEnabled = res.enabled;
+  await chrome.runtime.sendMessage({ type: nowEnabled ? "KEEPALIVE_STOP" : "KEEPALIVE_START" });
+  await loadKeepaliveStatus();
+  setStatus(nowEnabled ? "Keepalive dimatikan." : "Keepalive aktif — iCRM akan di-ping tiap 4 menit.");
+});
+
+function applyRadiusKeepaliveUI(enabled, status, lastPing) {
+  radiusDot.className = "keepalive-dot " + (enabled ? "dot-on" : "dot-off");
+  radiusKeepaliveStatus.textContent = enabled
+    ? status === "ok" ? "Aktif — sesi terjaga"
+    : status === "error" ? "Aktif — gagal ping"
+    : "Aktif — menunggu ping..."
+    : "Nonaktif";
+  radiusToggle.textContent = enabled ? "Matikan" : "Aktifkan";
+  radiusToggle.className = "btn btn-sm " + (enabled ? "btn-danger" : "btn-primary");
+  radiusLastPing.textContent = enabled ? formatLastPing(lastPing) : "";
+}
+
+async function loadRadiusKeepaliveStatus() {
+  try {
+    const res = await chrome.runtime.sendMessage({ type: "RADIUS_KEEPALIVE_GET_STATUS" });
+    applyRadiusKeepaliveUI(res.enabled, res.status, res.lastPing);
+  } catch {
+    applyRadiusKeepaliveUI(false, "off", null);
+  }
+}
+
+radiusToggle.addEventListener("click", async () => {
+  const res = await chrome.runtime.sendMessage({ type: "RADIUS_KEEPALIVE_GET_STATUS" });
+  const nowEnabled = res.enabled;
+  await chrome.runtime.sendMessage({ type: nowEnabled ? "RADIUS_KEEPALIVE_STOP" : "RADIUS_KEEPALIVE_START" });
+  await loadRadiusKeepaliveStatus();
+  setStatus(nowEnabled ? "Radius keepalive dimatikan." : "Radius keepalive aktif — akan di-ping tiap 4 menit.");
+});
 
 const RADIUS_NAS_CANONICAL = [
   "BALI",
@@ -64,7 +139,8 @@ const NAS_ALIAS_RULES = [
 
 function setStatus(message, isError = false) {
   statusText.textContent = message;
-  statusText.style.color = isError ? "#dc2626" : "inherit";
+  statusText.classList.toggle("is-error", isError);
+  statusText.classList.toggle("is-success", !isError && Boolean(message));
 }
 
 function populateRegions() {
@@ -107,9 +183,21 @@ function normalizeNasForRadius(rawNas) {
   return text;
 }
 
+const PACKAGE_RADIUS_MAP = [
+  { icrm: "ICONNET BIZ - 75 MBPS",   radius: "ICONETBIZ 75MB" },
+  { icrm: "ICONNET BIZ - 150 MBPS",  radius: "ICONETBIZ 150MB" },
+  { icrm: "ICONNET BIZ - 200 MBPS",  radius: "ICONETBIZ 200MB" },
+  { icrm: "ICONNET BIZ - 250 MBPS",  radius: "ICONETBIZ 250MB" },
+];
+
 function normalizePackageForRadius(rawPackage) {
   const text = String(rawPackage || "").trim().toUpperCase();
   if (!text || text === "-") return "-";
+
+  const exactMatch = PACKAGE_RADIUS_MAP.find(
+    (entry) => text === entry.icrm.toUpperCase()
+  );
+  if (exactMatch) return exactMatch.radius;
 
   const speedMatch = text.match(/(\d+)\s*(G|GB|GBPS|M|MB|MBPS)/);
   const speedValue = speedMatch ? speedMatch[1] : "";
@@ -121,8 +209,13 @@ function normalizePackageForRadius(rawPackage) {
 
   const normalizedUnit = speedUnit.startsWith("G") ? "GB" : "MB";
 
-  if (text.includes("BIZ")) {
-    return `ICONNETBIZ ${speedValue}${normalizedUnit}`;
+  if (text.includes("ICONNET BIZ") || text.includes("ICONETBIZ") || text.includes("IBIZ")) {
+    return `ICONETBIZ ${speedValue}${normalizedUnit}`;
+  }
+
+  if (text.includes("EDSG")) {
+    const edsgUnit = speedUnit.startsWith("G") ? "gb" : "mb";
+    return `EDSG-ret${speedValue}${edsgUnit}`;
   }
 
   if (text.includes("QRET")) {
@@ -131,6 +224,10 @@ function normalizePackageForRadius(rawPackage) {
 
   if (text.includes("JUNIPER")) {
     return `JUNIPER-${speedValue}${normalizedUnit}`;
+  }
+
+  if (text.includes("BIZ")) {
+    return `BIZ-${speedValue}${normalizedUnit}`;
   }
 
   return `PAKET-${speedValue}${normalizedUnit}`;
@@ -420,6 +517,20 @@ searchBtn.addEventListener("click", async () => {
   }
 });
 
+copyNasBtn.addEventListener("click", async () => {
+  const val = nasValue.textContent.trim();
+  if (!val || val === "-") { setStatus("Belum ada NAS untuk di-copy.", true); return; }
+  await navigator.clipboard.writeText(val);
+  setStatus(`NAS disalin: ${val}`);
+});
+
+copyBngBtn.addEventListener("click", async () => {
+  const val = bngValue.textContent.trim();
+  if (!val || val === "-") { setStatus("Belum ada BNG untuk di-copy.", true); return; }
+  await navigator.clipboard.writeText(val);
+  setStatus(`BNG disalin: ${val}`);
+});
+
 generateBtn.addEventListener("click", async () => {
   try {
     await generateRadiusData();
@@ -450,4 +561,6 @@ showSavedBtn.addEventListener("click", async () => {
   } catch {
     setStatus('Klik "Deteksi dari halaman" atau isi manual VLAN/REGION.');
   }
+  await loadKeepaliveStatus();
+  await loadRadiusKeepaliveStatus();
 })();
